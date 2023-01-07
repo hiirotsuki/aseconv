@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
 	unsigned short chunk_size;
 	const char *ase = "ASEF", *rgb = "RGB ", *cmyk = "CMYK", *lab = "LAB ", *gray = "Gray";
 
-	if(argc != 2)
+	if(argc < 2)
 	{
-		printf("usage: %s <palette.ase>\n", argv[0]);
+		fprintf(stderr, "usage: aseconv <palette.ase>\n");
 		return 1;
 	}
 
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
 	if(!p || p[1] == '\0' || p[2] == '\0' || p[3] == '\0')
 	{
-		printf("usage: %s <palette.ase>\n", argv[0]);
+		fprintf(stderr, "usage: aseconv <palette.ase>\n");
 		return 1;
 	}
 
@@ -48,13 +48,13 @@ int main(int argc, char *argv[])
 
 	if(!(in = fopen(argv[1], "rb")))
 	{
-		printf("%s: %s\n", argv[0], strerror(errno));
+		fprintf(stderr, "aseconv: %s\n", strerror(errno));
 		return 1;
 	}
 
 	if(!(out = fopen(filename, "wb")))
 	{
-		printf("%s: %s\n", argv[0], strerror(errno));
+		fprintf(stderr, "aseconv: %s\n", strerror(errno));
 		return 1;
 	}
 
@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
 
 	if(memcmp(ase, buf, 4))
 	{
-		puts("not an ASE file");
-		exit(1);
+		fprintf(stderr, "not an ASE file\n");
+		return 1;
 	}
 
 	/* TODO: read ASE version, currently at buf 4-7 */
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 #endif
 
 	count = read_uint32_be(&buf[8]);
-	printf("chunk count: %d\n", count);
+	fprintf(stdout, "chunk count: %d\n", count);
 
 	/* CHUNK types: */
 	/* palette name	= 0xC0010000 */
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 	{
 		if(fread(buf, 1, 6, in) != 6)
 		{
-			puts("ERROR: truncated chunk");
+			fprintf(stderr, "ERROR: truncated chunk\n");
 			break;
 		}
 
@@ -134,18 +134,16 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
-				puts("FIXME: unsupported color sequences");
+				fprintf(stderr, "FIXME: unsupported color sequences\n");
 				count--;
 				continue;
 			}
 
 			gimp_emit_line(out, r, g, b);
 		}
-		/* I don't even know */
+		/* end of folder? */
 		else if(!memcmp(&buf[0], "\xC0\x02", 2))
 		{
-			/* these mystery chunks appear to only ever be empty */
-			/* do nothing... */
 		}
 		else
 		{
@@ -156,7 +154,7 @@ int main(int argc, char *argv[])
 	}
 
 	if(count != 0)
-		printf("BUG: %d chunks remain\n", count);
+		fprintf(stderr, "BUG: %d chunks remain\n", count);
 
 	return 0;
 }
