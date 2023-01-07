@@ -13,7 +13,7 @@ float bytes_to_float(const unsigned char *bytes);
 unsigned int bytes_to_rgb(const unsigned char *bytes);
 struct rgb from_cmyk(const unsigned char *bytes);
 
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
 	char *p;
 	int count;
