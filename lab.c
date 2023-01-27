@@ -1,11 +1,20 @@
+#include <stdlib.h>
 #include <math.h>
 
 #include "color.h"
 
-struct rgb from_lab(float l, float a, float b)
+RGB *from_lab(float l, float a, float b)
 {
-	struct rgb color;
+	RGB *rgb_color;
 	float z, y, x, fr, fg, fb;
+
+	rgb_color = malloc(sizeof(RGB));
+
+	if(!rgb_color)
+	{
+		fprintf(stderr, "Out of memory");
+		exit(1);
+	}
 
 	/* L*a*b* -> XYZ */
 
@@ -57,27 +66,27 @@ struct rgb from_lab(float l, float a, float b)
 
 	if(fr > 0)
 		if(fr < 1)
-			color.r = fr * 255;
+			rgb_color->r = fr * 255;
 		else
-			color.r = 255;
+			rgb_color->r = 255;
 	else
-		color.r = 0;
+		rgb_color->r = 0;
 
 	if(fg > 0)
 		if(fg < 1)
-			color.g = fg * 255;
+			rgb_color->g = fg * 255;
 		else
-			color.g = 255;
+			rgb_color->g = 255;
 	else
-		color.g = 0;
+		rgb_color->g = 0;
 
 	if(fb > 0)
 		if(fb < 1)
-			color.b = fb * 255;
+			rgb_color->b = fb * 255;
 		else
-			color.b = 255;
+			rgb_color->b = 255;
 	else
-		color.b = 0;
+		rgb_color->b = 0;
 
-	return color;
+	return rgb_color;
 }

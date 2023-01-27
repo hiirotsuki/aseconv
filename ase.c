@@ -11,7 +11,7 @@
 
 float bytes_to_float(const unsigned char *bytes);
 unsigned int bytes_to_rgb(const unsigned char *bytes);
-struct rgb from_cmyk(const unsigned char *bytes);
+RGB *from_cmyk(const unsigned char *bytes);
 
 int main(int argc, char *argv[])
 {
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	float f1, f2, f3;
 	char filename[512];
 	unsigned int r, g, b;
-	struct rgb rgb_colors;
+	RGB *rgb_colors;
 	unsigned char buf[1024];
 	unsigned short chunk_size;
 	const char *ase = "ASEF", *rgb = "RGB ", *cmyk = "CMYK", *lab = "LAB ", *gray = "Gray";
@@ -111,9 +111,10 @@ int main(int argc, char *argv[])
 			else if(!memcmp(cmyk, &buf[chunk_size - 22], 4))
 			{
 				rgb_colors = from_cmyk(&buf[chunk_size - 18]);
-				r = rgb_colors.r;
-				g = rgb_colors.g;
-				b = rgb_colors.b;
+				r = rgb_colors->r;
+				g = rgb_colors->g;
+				b = rgb_colors->b;
+				free(rgb_colors);
 			}
 			else if(!memcmp(gray, &buf[chunk_size - 10], 4))
 			{
@@ -128,9 +129,10 @@ int main(int argc, char *argv[])
 				f2 = bytes_to_float(&buf[chunk_size - 10]);
 				f3 = bytes_to_float(&buf[chunk_size - 6]);
 				rgb_colors = from_lab(f1 * 100, f2, f3);
-				r = rgb_colors.r;
-				g = rgb_colors.g;
-				b = rgb_colors.b;
+				r = rgb_colors->r;
+				g = rgb_colors->g;
+				b = rgb_colors->b;
+				free(rgb_colors);
 			}
 			else
 			{
@@ -156,6 +158,8 @@ int main(int argc, char *argv[])
 	if(count != 0)
 		fprintf(stderr, "BUG: %d chunks remain\n", count);
 
+	fclose(in);
+	fclose(out);
 	return 0;
 }
 
@@ -168,11 +172,19 @@ float bytes_to_float(const unsigned char *bytes)
 	return f;
 }
 
-struct rgb from_cmyk(const unsigned char *bytes)
+RGB *from_cmyk(const unsigned char *bytes)
 {
-	struct rgb color;
+	RGB *color;
 	float f1, f2, f3, f4;
 	uint32_t u1, u2, u3, u4;
+
+	color = malloc(sizeof(RGB));
+
+	if(!color)
+	{
+		fprintf(stderr, "Out of memory");
+		exit(1);
+	}
 
 	u1 = read_uint32_be(&bytes[0]);
 	u2 = read_uint32_be(&bytes[4]);
@@ -185,13 +197,13 @@ struct rgb from_cmyk(const unsigned char *bytes)
 	memcpy(&f4, &u4, 4);
 
 #if 0
-	color.r = (uint32_t)round(255 * (1 - f1) * (1 - f4));
-	color.g = (uint32_t)round(255 * (1 - f2) * (1 - f4));
-	color.b = (uint32_t)round(255 * (1 - f3) * (1 - f4));
+	color->r = (uint32_t)round(255 * (1 - f1) * (1 - f4));
+	color->g = (uint32_t)round(255 * (1 - f2) * (1 - f4));
+	color->b = (uint32_t)round(255 * (1 - f3) * (1 - f4));
 #else
-	color.r = (uint32_t)floor((255 * (1 - f1) * (1 - f4)) + 0.5);
-	color.g = (uint32_t)floor((255 * (1 - f2) * (1 - f4)) + 0.5);
-	color.b = (uint32_t)floor((255 * (1 - f3) * (1 - f4)) + 0.5);
+	color->r = (uint32_t)floor((255 * (1 - f1) * (1 - f4)) + 0.5);
+	color->g = (uint32_t)floor((255 * (1 - f2) * (1 - f4)) + 0.5);
+	color->b = (uint32_t)floor((255 * (1 - f3) * (1 - f4)) + 0.5);
 #endif
 
 	return color;

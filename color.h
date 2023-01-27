@@ -1,12 +1,12 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-struct rgb
+typedef struct _rgb
 {
 	unsigned int r, g, b;
-};
+} RGB;
 
-struct rgb from_hsv(float hue, float saturation, float value);
-struct rgb from_lab(float l, float a, float b);
+RGB *from_hsv(float hue, float saturation, float value);
+RGB *from_lab(float l, float a, float b);
 
 #endif
