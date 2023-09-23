@@ -35,7 +35,13 @@ int main(int argc, char *argv[])
 	strcpy(filename, argv[1]);
 	p = strrchr(filename, '.');
 
-	if(!p || p[1] == '\0' || p[2] == '\0' || p[3] == '\0')
+	if(p == NULL)
+	{
+		fprintf(stderr, "usage: aseconv <palette.ase>\n");
+		return 1;
+	}
+
+	if(p[1] == '\0' || p[2] == '\0' || p[3] == '\0')
 	{
 		fprintf(stderr, "usage: aseconv <palette.ase>\n");
 		return 1;
