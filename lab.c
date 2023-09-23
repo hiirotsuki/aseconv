@@ -1,14 +1,15 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
 #include "color.h"
 
-RGB *from_lab(float l, float a, float b)
+struct rgb *from_lab(float l, float a, float b)
 {
-	RGB *rgb_color;
+	struct rgb *rgb_color;
 	float z, y, x, fr, fg, fb;
 
-	rgb_color = malloc(sizeof(RGB));
+	rgb_color = malloc(sizeof(struct rgb));
 
 	if(!rgb_color)
 	{

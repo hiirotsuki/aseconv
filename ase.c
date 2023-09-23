@@ -11,7 +11,7 @@
 
 float bytes_to_float(const unsigned char *bytes);
 unsigned int bytes_to_rgb(const unsigned char *bytes);
-RGB *from_cmyk(const unsigned char *bytes);
+struct rgb *from_cmyk(const unsigned char *bytes);
 
 int main(int argc, char *argv[])
 {
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 	float f1, f2, f3;
 	char filename[512];
 	unsigned int r, g, b;
-	RGB *rgb_colors;
+	struct rgb *rgb_colors;
 	unsigned char buf[1024];
 	unsigned short chunk_size;
 	const char *ase = "ASEF", *rgb = "RGB ", *cmyk = "CMYK", *lab = "LAB ", *gray = "Gray";
@@ -172,13 +172,13 @@ float bytes_to_float(const unsigned char *bytes)
 	return f;
 }
 
-RGB *from_cmyk(const unsigned char *bytes)
+struct rgb *from_cmyk(const unsigned char *bytes)
 {
-	RGB *color;
+	struct rgb *color;
 	float f1, f2, f3, f4;
 	uint32_t u1, u2, u3, u4;
 
-	color = malloc(sizeof(RGB));
+	color = malloc(sizeof(struct rgb));
 
 	if(!color)
 	{
