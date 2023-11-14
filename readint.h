@@ -1,5 +1,5 @@
-#ifndef INCLUDE_READBYTES_H
-#define INCLUDE_READBYTES_H
+#ifndef INCLUDE_READINT_H
+#define INCLUDE_READINT_H
 
 #include <stdint.h>
 #include <string.h>

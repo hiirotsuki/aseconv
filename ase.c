@@ -6,7 +6,7 @@
 #include <errno.h>
 
 #include "color.h"
-#include "readbytes.h"
+#include "readint.h"
 #include "gimp.h"
 
 float bytes_to_float(const unsigned char *bytes);
