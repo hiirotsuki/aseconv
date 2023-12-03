@@ -1,3 +1,7 @@
+aseconv
+aseconv.exe
+acoconv
+acoconv.exe
 *.o
 *.gpl
 *.exe
